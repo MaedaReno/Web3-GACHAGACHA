@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sample-001",
+    "difficulty": "easy",
+    "question": "ブロックチェーンで、取引履歴をまとめて時系列につなげていく基本単位を何と呼ぶ?",
+    "answers": ["ブロック", "block"],
+    "source": "サンプル(要差し替え)"
+  },
+  {
+    "id": "sample-002",
+    "difficulty": "normal",
+    "question": "イーサリアム上で動く、条件を満たすと自動で実行されるプログラムを一般に何と呼ぶ?",
+    "answers": ["スマートコントラクト", "smart contract", "スマコン"],
+    "source": "サンプル(要差し替え)"
+  },
+  {
+    "id": "sample-003",
+    "difficulty": "normal",
+    "question": "MetaMask のように、暗号資産の鍵を管理し取引に署名するツールの総称は?",
+    "answers": ["ウォレット", "wallet", "財布"],
+    "source": "サンプル(要差し替え)"
+  },
+  {
+    "id": "sample-004",
+    "difficulty": "hard",
+    "question": "LLMに外部知識を検索して渡し、回答の根拠にする手法の略称(英3文字)は?",
+    "answers": ["RAG", "rag", "検索拡張生成"],
+    "source": "サンプル(要差し替え)"
+  }
+]

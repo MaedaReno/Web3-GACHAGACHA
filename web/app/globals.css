@@ -1,0 +1,45 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
+
+/* ステージ(大画面)= 暗色・大きく */
+.stage {
+  min-height: 100vh;
+  background: #12100e;
+  color: #f4f1ea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 3vh 4vw;
+  text-align: center;
+}
+.stage .avatar { font-size: clamp(6rem, 22vh, 16rem); line-height: 1; }
+.stage .subtitle {
+  font-size: clamp(1.8rem, 5vh, 4rem);
+  font-weight: 700;
+  max-width: 90vw;
+  min-height: 1.2em;
+  text-shadow: 0 2px 12px rgba(0,0,0,.5);
+}
+.stage .customer { font-size: clamp(1rem, 2.4vh, 1.6rem); opacity: .7; min-height: 1.4em; }
+.stage .price { font-size: clamp(1.4rem, 4vh, 3rem); color: #ffcf6b; font-weight: 800; }
+.stage .join {
+  display: flex; align-items: center; gap: 2rem;
+  background: #fff; color: #12100e; padding: 1.5rem 2rem; border-radius: 1rem;
+}
+.stage .code { font-size: clamp(2rem, 6vh, 5rem); font-weight: 900; letter-spacing: .2em; }
+
+/* コントローラ(スマホ)= 明色・チャット */
+.play { max-width: 560px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 1rem; }
+.play h1 { font-size: 1.1rem; margin: .2rem 0; }
+.play .log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .5rem; padding: .5rem 0; }
+.play .bubble { padding: .6rem .9rem; border-radius: 1rem; max-width: 85%; white-space: pre-wrap; }
+.play .me { align-self: flex-end; background: #2f6df6; color: #fff; }
+.play .shop { align-self: flex-start; background: #efeae0; color: #12100e; }
+.play .sys { align-self: center; color: #888; font-size: .85rem; }
+.play .priceBar { font-weight: 700; padding: .4rem 0; border-top: 1px solid #eee; }
+.play form { display: flex; gap: .5rem; padding-top: .5rem; }
+.play input[type=text] { flex: 1; padding: .7rem; font-size: 1rem; border: 1px solid #ccc; border-radius: .6rem; }
+.play button { padding: .7rem 1rem; font-size: 1rem; border: 0; border-radius: .6rem; background: #2f6df6; color: #fff; }
+.play button:disabled { background: #aaa; }
