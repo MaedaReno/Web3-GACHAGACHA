@@ -22,8 +22,10 @@ WORKDIR /app
 COPY backend/requirements.txt backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
-# --- GPUでWhisperを動かす場合はこの1行を有効化(CUDA/cuDNNをpipで同梱) ---
-# RUN pip install --no-cache-dir nvidia-cublas-cu12 nvidia-cudnn-cu12
+# GPUでWhisperを使うときは CUDA=1 でビルドすると CUDA/cuDNN を同梱する(CPUなら不要)。
+# 例: docker compose -f docker-compose.yml -f docker-compose.gpu.yml build
+ARG CUDA=0
+RUN if [ "$CUDA" = "1" ]; then pip install --no-cache-dir nvidia-cublas-cu12 nvidia-cudnn-cu12; fi
 
 COPY backend backend
 COPY ingest ingest

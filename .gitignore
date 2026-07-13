@@ -13,6 +13,7 @@ web/out/
 # ローカル環境設定・秘密(コミットしない)
 .env
 .env.*
+!.env.example
 !.env.local.example
 web/.env
 web/.env.*

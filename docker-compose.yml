@@ -1,0 +1,42 @@
+# バックエンド一式を1コマンドで起動する(CPU版・開発/デモ向け)。
+#   docker compose up --build
+# 研究室GPUサーバでは docker-compose.gpu.yml を重ねる(下記 README 参照)。
+#
+# 秘密や設定は同じフォルダの .env から読む(.env.example をコピーして作る)。
+
+services:
+  # 音声合成エンジン。backend からは http://voicevox:50021 で届く(ホストOS非依存)。
+  voicevox:
+    image: voicevox/voicevox_engine:cpu-latest
+    ports:
+      - "50021:50021" # ホストから直接確認したい場合用(無くても backend は届く)
+    restart: unless-stopped
+
+  # 頭脳・決済検証・解錠エンドポイント(FastAPI)
+  backend:
+    build:
+      context: .
+    depends_on:
+      - voicevox
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?ANTHROPIC_API_KEY を .env に設定してください}
+      GACHA_MODEL: ${GACHA_MODEL:-claude-haiku-4-5}
+      GACHA_WALLET: ${GACHA_WALLET:-0x0d9Ff88703b8bcB42ca7e526246C2dcf9A4aEdb9}
+      GACHA_UNLOCK_TOKEN: ${GACHA_UNLOCK_TOKEN:-change-me-secret}
+      VOICEVOX_URL: http://voicevox:50021
+    ports:
+      - "8000:8000"
+    volumes:
+      - whisper-cache:/root/.cache # Whisperモデルを保持(毎回DLしない)
+    restart: unless-stopped
+
+  # ローカルの backend を公開URL(wss)にする。URLは `docker compose logs cloudflared` に出る。
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --url http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  whisper-cache:

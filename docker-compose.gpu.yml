@@ -1,0 +1,32 @@
+# 研究室GPUサーバ用の上乗せ設定。Whisper と VOICEVOX を GPU で動かす。
+# 使い方(ベースと重ねて実行):
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up --build
+# 前提: ホストに NVIDIA ドライバ + nvidia-container-toolkit(研究室サーバは通常導入済み)。
+
+services:
+  backend:
+    build:
+      context: .
+      args:
+        CUDA: "1" # CUDA/cuDNN を同梱してビルド
+    environment:
+      GACHA_WHISPER_DEVICE: cuda
+      GACHA_WHISPER_COMPUTE: float16
+      GACHA_WHISPER_MODEL: large-v3
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  voicevox:
+    image: voicevox/voicevox_engine:nvidia-latest
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
