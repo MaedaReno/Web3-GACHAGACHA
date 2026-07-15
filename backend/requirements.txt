@@ -13,5 +13,6 @@ faster-whisper>=1.0
 qdrant-client>=1.7
 FlagEmbedding>=1.2        # bge-m3(BGEM3FlagModel)。初回に約2GBのモデルを取得する。
 yt-dlp                    # transcribe.py で YouTube から音声DL(GPUコンテナ内バッチ実行でも使う)
+pypdf>=4.0               # materials_parse.py で講義資料(PDF)からテキスト抽出
 
 # web3                                     # Phase 4: チェーン監視(決済確認)

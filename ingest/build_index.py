@@ -72,6 +72,24 @@ def _load_discord() -> list[dict]:
     return out
 
 
+def _load_materials() -> list[dict]:
+    # materials_parse.py が既にチャンク済みなのでそのまま使う
+    path = os.path.join(config.INGEST_DATA_DIR, "materials.json")
+    if not os.path.exists(path):
+        return []
+    with open(path, encoding="utf-8") as f:
+        rows = json.load(f)
+    return [
+        {
+            "id": r["id"],
+            "lecture": r["lecture"],
+            "timestamp": r.get("timestamp", ""),
+            "text": r["text"],
+        }
+        for r in rows
+    ]
+
+
 def collect_chunks() -> list[dict]:
     chunks: list[dict] = []
     lec_dir = os.path.join(config.INGEST_DATA_DIR, "lectures")
@@ -83,6 +101,10 @@ def collect_chunks() -> list[dict]:
     if disc:
         print(f"[Discord] {len(disc)} チャンク")
     chunks.extend(disc)
+    mats = _load_materials()
+    if mats:
+        print(f"[資料] {len(mats)} チャンク")
+    chunks.extend(mats)
     return chunks
 
 
