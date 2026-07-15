@@ -27,7 +27,11 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - whisper-cache:/root/.cache # Whisperモデルを保持(毎回DLしない)
+      - whisper-cache:/root/.cache # Whisper/bge-m3 モデルを保持(毎回DLしない)
+      # Phase 0 の ingest 出力(文字起こし・Qdrant DB)をホスト側に残す。
+      # これで `docker compose run backend python ingest/...` の結果が ./ingest に出て、
+      # 起動中の backend も同じ Qdrant インデックスを読める(rag.py が自動でベクトル検索に)。
+      - ./ingest:/app/ingest
     restart: unless-stopped
 
   # ローカルの backend を公開URL(wss)にする。URLは `docker compose logs cloudflared` に出る。

@@ -6,5 +6,12 @@ uvicorn[standard]>=0.29   # WebSocket 対応(standard に websockets 同梱)
 # Phase 3: 音声認識(STT)。重め。開発CPUは small+int8、本番GPUは large-v3+cuda 推奨。
 # VOICEVOX(音声合成)は外部サービスなので pip 依存は不要(HTTPで叩くだけ)。
 faster-whisper>=1.0
-# qdrant-client, FlagEmbedding             # Phase 0/RAG: bge-m3 + Qdrant
+
+# Phase 0: 講義データRAG(オフライン前処理 + 検索)。
+#   bge-m3 埋め込み(ローカル・無料) + Qdrant 埋め込みモード(Docker不要)。
+#   これらが未導入でも rag.py はキーワード方式に自動フォールバックする(Phase 1〜4 は動く)。
+qdrant-client>=1.7
+FlagEmbedding>=1.2        # bge-m3(BGEM3FlagModel)。初回に約2GBのモデルを取得する。
+yt-dlp                    # transcribe.py で YouTube から音声DL(GPUコンテナ内バッチ実行でも使う)
+
 # web3                                     # Phase 4: チェーン監視(決済確認)

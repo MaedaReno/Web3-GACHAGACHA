@@ -64,7 +64,31 @@ _ROOT = os.path.dirname(_HERE)
 QUIZ_BANK_PATH = os.environ.get(
     "GACHA_QUIZ_BANK", os.path.join(_ROOT, "ingest", "quiz_bank.json")
 )
-# Phase 0 の本格RAG(Qdrant)導入までの暫定コーパス。
+# キーワード方式(フォールバック)が読むコーパス。Qdrant が使えないときの保険。
+# Phase 0 で講義を投入したら lectures_sample.json をビルド出力に差し替えてもよいが、
+# 通常は Qdrant バックエンドが優先されるためこれは保険用途。
 LECTURE_CORPUS_PATH = os.environ.get(
     "GACHA_LECTURE_CORPUS", os.path.join(_ROOT, "ingest", "lectures_sample.json")
+)
+
+# --- Phase 0: RAG(bge-m3 埋め込み + Qdrant)---
+# 埋め込みモデル。bge-m3 は多言語・日本語に強く、ローカルで無料で動く(初回DL約2GB)。
+EMBED_MODEL = os.environ.get("GACHA_EMBED_MODEL", "BAAI/bge-m3")
+EMBED_DIM = int(os.environ.get("GACHA_EMBED_DIM", "1024"))   # bge-m3 の dense 次元
+# GPU では True で高速化。CPU 開発では False(既定)。
+EMBED_USE_FP16 = os.environ.get("GACHA_EMBED_FP16", "0") == "1"
+
+# Qdrant 接続。URL を指定すれば Docker/サーバの Qdrant を使う(本番)。
+# 未指定なら QDRANT_PATH のローカル埋め込みモード(Docker不要・開発既定)。
+#   ※ 埋め込みモードはディレクトリを排他ロックする。build_index.py 実行中は
+#     バックエンドを止めておくこと(本番は URL 指定で同時アクセス可)。
+QDRANT_URL = os.environ.get("GACHA_QDRANT_URL", "").strip()
+QDRANT_PATH = os.environ.get(
+    "GACHA_QDRANT_PATH", os.path.join(_ROOT, "ingest", "qdrant_db")
+)
+QDRANT_COLLECTION = os.environ.get("GACHA_QDRANT_COLLECTION", "lectures")
+
+# ingest 中間データの置き場。
+INGEST_DATA_DIR = os.environ.get(
+    "GACHA_INGEST_DATA", os.path.join(_ROOT, "ingest", "data")
 )

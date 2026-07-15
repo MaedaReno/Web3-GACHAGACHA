@@ -20,6 +20,11 @@ web/.env.*
 !web/.env.local.example
 *.local
 
+# Phase 0: ingest 生成物(動画・文字起こし・ベクトルDBは重い/秘匿なのでコミットしない)
+ingest/data/
+ingest/qdrant_db/
+ingest/quiz_candidates.json
+
 # OS / エディタ
 .DS_Store
 Thumbs.db
