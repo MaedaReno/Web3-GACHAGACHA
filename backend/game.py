@@ -21,6 +21,10 @@ def _normalize(text: str) -> str:
     text = text.translate(
         {i: i - 0xFEE0 for i in range(0xFF01, 0xFF5F)}
     )
+    # カタカナ→ひらがな(「イチゴ」と「いちご」等の表記ゆれを吸収。音声入力対策)
+    text = "".join(
+        chr(ord(c) - 0x60) if "ァ" <= c <= "ヶ" else c for c in text
+    )
     text = text.replace("　", " ")
     # 記号・空白を除去(かな/漢字/英数のみ残す)
     text = re.sub(r"[\s　\.,、。・/／\-—_（）()「」『』\"']", "", text)

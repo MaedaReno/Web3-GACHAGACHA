@@ -1,30 +1,114 @@
 [
   {
-    "id": "sample-001",
+    "id": "q-001",
     "difficulty": "easy",
-    "question": "ブロックチェーンで、取引履歴をまとめて時系列につなげていく基本単位を何と呼ぶ?",
-    "answers": ["ブロック", "block"],
-    "source": "サンプル(要差し替え)"
+    "question": "「Web3/AI概論」は千葉工業大学で何年目の授業でしょう?",
+    "answers": ["4年目", "4年", "四年目"],
+    "source": "第1回"
   },
   {
-    "id": "sample-002",
+    "id": "q-002",
+    "difficulty": "easy",
+    "question": "この講義は全部で何回あるでしょう?",
+    "answers": ["13回"],
+    "source": "第1回"
+  },
+  {
+    "id": "q-003",
+    "difficulty": "easy",
+    "question": "この講義のオリジナル通貨は2つ。ジョイントークンと、もう一つは何トークン?",
+    "answers": ["イチゴトークン", "イチゴ"],
+    "source": "第2回"
+  },
+  {
+    "id": "q-004",
+    "difficulty": "easy",
+    "question": "この講義は現地とオンラインを合わせた何という方式で開催されてる?",
+    "answers": ["ハイブリッド", "ハイブリッド開催"],
+    "source": "第8回"
+  },
+  {
+    "id": "q-005",
+    "difficulty": "easy",
+    "question": "成績取得に必須のセットアップを一つ挙げてみて(ヒント: Discord・MetaMask・GitHub・マナバ)",
+    "answers": ["Discord", "MetaMask", "GitHub", "マナバ", "ディスコード", "メタマスク", "ギットハブ"],
+    "source": "第4回"
+  },
+  {
+    "id": "q-006",
+    "difficulty": "easy",
+    "question": "受講生全員に配られたClaudeのプランは何プラン?",
+    "answers": ["プロプラン", "proプラン", "プロ"],
+    "source": "第9回"
+  },
+  {
+    "id": "q-007",
     "difficulty": "normal",
-    "question": "イーサリアム上で動く、条件を満たすと自動で実行されるプログラムを一般に何と呼ぶ?",
-    "answers": ["スマートコントラクト", "smart contract", "スマコン"],
-    "source": "サンプル(要差し替え)"
+    "question": "社会を模した3つのロール、「ビジネス(産)」「学」と、あと一つは?",
+    "answers": ["ガバメント", "官", "government", "行政"],
+    "source": "第1回"
   },
   {
-    "id": "sample-003",
+    "id": "q-008",
     "difficulty": "normal",
-    "question": "MetaMask のように、暗号資産の鍵を管理し取引に署名するツールの総称は?",
-    "answers": ["ウォレット", "wallet", "財布"],
-    "source": "サンプル(要差し替え)"
+    "question": "第1・2回では作り方(How)を学んだ。第3回のテーマ「何を作るか」を英語一語だと?",
+    "answers": ["what", "ワット", "何を作るか"],
+    "source": "第3回"
   },
   {
-    "id": "sample-004",
+    "id": "q-009",
+    "difficulty": "normal",
+    "question": "Claudeでコードを書く・作業するやり方は、大きく何パターンある?",
+    "answers": ["3つ", "3パターン", "三つ"],
+    "source": "第9回"
+  },
+  {
+    "id": "q-010",
+    "difficulty": "normal",
+    "question": "自分の得意なスキルを出品できる、スキルマーケットの機能の名前は?",
+    "answers": ["スキルを届ける", "スキルを届けるところ"],
+    "source": "第4回"
+  },
+  {
+    "id": "q-011",
+    "difficulty": "normal",
+    "question": "最終回のちばテックプロトタイプで、全員必須の課題は何?",
+    "answers": ["ポスター展示", "ポスター発表", "ポスター"],
+    "source": "第10回"
+  },
+  {
+    "id": "q-012",
     "difficulty": "hard",
-    "question": "LLMに外部知識を検索して渡し、回答の根拠にする手法の略称(英3文字)は?",
-    "answers": ["RAG", "rag", "検索拡張生成"],
-    "source": "サンプル(要差し替え)"
+    "question": "イーサリアム創設者ヴィタリックがバーンしたSHIB(柴犬)トークンの当時の価値は、約何ドル?",
+    "answers": ["64億ドル", "64億"],
+    "source": "第7回"
+  },
+  {
+    "id": "q-013",
+    "difficulty": "hard",
+    "question": "最終発表のアウトプットは3種類。「プロダクト系」「AIエージェント系」と、あと一つは?",
+    "answers": ["研究系", "研究"],
+    "source": "第7回"
+  },
+  {
+    "id": "q-014",
+    "difficulty": "hard",
+    "question": "第7回で重要になるテーマは、「リテラシー」と何?",
+    "answers": ["セキュリティ"],
+    "source": "第7回"
+  },
+  {
+    "id": "q-015",
+    "difficulty": "hard",
+    "question": "AntiGravity 2.0で一時消えたが、IDEを入れ直すと復活した機能は?",
+    "answers": ["ターミナル", "terminal", "ターミナルボタン"],
+    "source": "第9回"
+  },
+  {
+    "id": "q-016",
+    "difficulty": "hard",
+    "question": "ジョイントークンを20万以上ためると、成績は何評価になる?",
+    "answers": ["S評価", "S"],
+    "source": "第2回"
   }
 ]

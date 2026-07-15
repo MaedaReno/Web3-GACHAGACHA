@@ -25,16 +25,28 @@ def test_normal_negotiation_within_range():
 
 
 def test_correct_quiz_lowers_effective_floor():
-    g = Game()
+    # 本番 quiz_bank.json の内容に依存しないよう、専用の bank を注入する
+    g = Game(quiz_bank=[
+        {"id": "t1", "difficulty": "easy", "question": "テスト?", "answers": ["ブロック"]},
+    ])
     before = g.state.effective_floor
     g.offer_quiz("easy")
-    # サンプル bank の easy 問題の正解「ブロック」
     r = g.grade_answer("ブロックです")
     assert r["correct"] is True
     after = g.state.effective_floor
     assert after == before - config.QUIZ_DISCOUNT_PER_CORRECT
     # 正解後は前より安い額まで下げられる
     assert g.set_price(after)["ok"] is True
+
+
+def test_kana_normalization_matches_across_scripts():
+    # カタカナ答え「イチゴ」に対し、ひらがな回答「いちご」でも正解になる(表記ゆれ吸収)
+    g = Game(quiz_bank=[
+        {"id": "t1", "difficulty": "easy", "question": "?", "answers": ["イチゴ"]},
+    ])
+    g.offer_quiz("easy")
+    assert g.grade_answer("いちご")["correct"] is True
+
 
 
 def test_wrong_quiz_no_reward():
