@@ -27,12 +27,14 @@ export default function StagePage() {
   const [audioReady, setAudioReady] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [expression] = useState<string>("neutral");
+  const [esp32, setEsp32] = useState(false);   // ESP32(施錠表示)とシリアル接続済みか
 
   const wsRef = useRef<WebSocket | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const srcRef = useRef<AudioBufferSourceNode | null>(null);
   const rafRef = useRef<number | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
+  const serialWriterRef = useRef<any>(null);   // ESP32 への書き込み口(Web Serial)
 
   useEffect(() => {
     const ws = new WebSocket(`${WS_URL}?role=stage`);
@@ -65,7 +67,8 @@ export default function StagePage() {
         case "unlocked":
           setUnlocked(true);
           setFinalized(true);
-          setMessages((m) => [...m, { who: "shop", text: "🎉 開錠!まいど、ありがとう!ガチャ回してや!" }]);
+          setMessages((m) => [...m, { who: "shop", text: "🎉 開錠!まいど、ありがとうございます!ガチャを回してください!" }]);
+          sendSerial("READY"); // 決済完了 → ESP32 の表示を READY(解錠OK)に
           break;
         case "reset_done":
           // 次のお客さんへ:初期状態に戻す(QRが再表示される)
@@ -74,6 +77,7 @@ export default function StagePage() {
           setPrice(null);
           setFinalized(false);
           setUnlocked(false);
+          sendSerial("LOCKED"); // 次のお客さんへ → 施錠表示に戻す
           break;
       }
     };
@@ -100,6 +104,44 @@ export default function StagePage() {
       wsRef.current?.send(JSON.stringify({ type: "reset" }));
     }
   };
+
+  // --- ESP32(施錠表示モニタ)への Web Serial 連携 ---
+  // 大画面PCとUSB有線でつないだESP32へ "READY"/"LOCKED" を送り、表示を切り替える。
+  const sendSerial = async (text: string) => {
+    const w = serialWriterRef.current;
+    if (!w) return;
+    try {
+      await w.write(new TextEncoder().encode(text + "\n"));
+    } catch {}
+  };
+  const openPort = async (port: any) => {
+    await port.open({ baudRate: 115200 });
+    serialWriterRef.current = port.writable.getWriter();
+    setEsp32(true);
+    sendSerial("LOCKED"); // 接続直後は施錠表示
+  };
+  const connectEsp32 = async () => {
+    const nav: any = navigator;
+    if (!nav.serial) {
+      alert("このブラウザは Web Serial 非対応です。Chrome か Edge で開いてください。");
+      return;
+    }
+    try {
+      const port = await nav.serial.requestPort();
+      await openPort(port);
+    } catch {
+      /* ユーザーがポート選択をキャンセル */
+    }
+  };
+  // 一度許可したポートは次回以降プロンプト無しで自動再接続する
+  useEffect(() => {
+    const nav: any = navigator;
+    if (!nav.serial?.getPorts) return;
+    nav.serial.getPorts().then((ports: any[]) => {
+      if (ports.length > 0) openPort(ports[0]).catch(() => {});
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 音声を自動で有効化する。ブラウザの自動再生制限で、多くの環境では「最初の1操作」が
   // 必要なので、まず自動 resume を試み、ダメでも画面のどこかを1回操作した時点で有効化する
@@ -230,6 +272,8 @@ export default function StagePage() {
       {/* 隅のコントロール(運営用) */}
       <div className="stage-controls">
         {!audioReady && <span className="audio-hint">🔇 画面を1回クリックで音声ON</span>}
+        {!esp32 && <button onClick={connectEsp32}>🔌 ESP32接続</button>}
+        {esp32 && <span className="audio-hint">🔒 ESP32接続済み</span>}
         {connected && <button onClick={nextCustomer}>▶ 次のお客さんへ</button>}
       </div>
     </main>
