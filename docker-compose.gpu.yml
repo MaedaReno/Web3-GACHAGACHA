@@ -21,12 +21,7 @@ services:
               count: all
               capabilities: [gpu]
 
-  voicevox:
-    image: voicevox/voicevox_engine:nvidia-latest
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+  # VOICEVOX は base の CPU 版(cpu-latest)をそのまま使う。
+  # nvidia-latest は同梱の推論カーネルが GPU アーキに合わないと
+  # 「cudaErrorNoKernelImageForDevice / 推論に失敗しました」で /synthesis が 500 になる。
+  # TTS は CPU で十分高速なので GPU 上書きはしない(backend/Whisper は GPU のまま)。
