@@ -101,13 +101,32 @@ export default function StagePage() {
     }
   };
 
-  // ブラウザの自動再生制限のため、最初に一度クリックして音声を有効化する。
-  const enableAudio = async () => {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    await ctx.resume();
+  // 音声を自動で有効化する。ブラウザの自動再生制限で、多くの環境では「最初の1操作」が
+  // 必要なので、まず自動 resume を試み、ダメでも画面のどこかを1回操作した時点で有効化する
+  // (専用ボタンは不要)。完全ゼロ操作にしたい場合はブラウザの自動再生を許可設定する。
+  useEffect(() => {
+    const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new Ctx();
     ctxRef.current = ctx;
-    setAudioReady(true);
-  };
+    const resume = async () => {
+      try { await ctx.resume(); } catch {}
+      if (ctx.state === "running") {
+        setAudioReady(true);
+        window.removeEventListener("pointerdown", resume);
+        window.removeEventListener("keydown", resume);
+        window.removeEventListener("touchstart", resume);
+      }
+    };
+    resume(); // 許可されていれば操作なしで有効化
+    window.addEventListener("pointerdown", resume);
+    window.addEventListener("keydown", resume);
+    window.addEventListener("touchstart", resume);
+    return () => {
+      window.removeEventListener("pointerdown", resume);
+      window.removeEventListener("keydown", resume);
+      window.removeEventListener("touchstart", resume);
+    };
+  }, []);
 
   const playSpeech = async (b64: string) => {
     const ctx = ctxRef.current;
@@ -210,7 +229,7 @@ export default function StagePage() {
 
       {/* 隅のコントロール(運営用) */}
       <div className="stage-controls">
-        {!audioReady && <button onClick={enableAudio}>🔊 音声を有効にする</button>}
+        {!audioReady && <span className="audio-hint">🔇 画面を1回クリックで音声ON</span>}
         {connected && <button onClick={nextCustomer}>▶ 次のお客さんへ</button>}
       </div>
     </main>
