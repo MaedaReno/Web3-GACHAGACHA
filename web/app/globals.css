@@ -1,33 +1,34 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
 
-/* ステージ(大画面)= 祭り会場背景 + キャラ立ち絵 */
+/* ステージ(大画面)= 祭り会場背景。左=キャラ / 右=QR→接続後はチャット。1画面に収める。 */
 .stage {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: #12100e url('/maturi-kaijou.jpg') center / cover no-repeat;
   color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.4rem;
-  padding: 3vh 4vw 5vh;
-  text-align: center;
-  overflow: hidden;
 }
-/* 背景を少し暗くして字幕を読みやすく(特に下部) */
 .stage::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,.20) 0%, rgba(0,0,0,.10) 45%, rgba(0,0,0,.72) 100%);
+  background: linear-gradient(to right, rgba(0,0,0,.25), rgba(0,0,0,.05) 42%, rgba(0,0,0,.5));
   pointer-events: none;
 }
-.stage > * { position: relative; z-index: 1; }
+.stage-grid {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2vw;
+  padding: 2.5vh 2.5vw;
+  align-items: stretch;
+}
 
-/* キャラ立ち絵。ベース(口閉じ)の上に口開き画像を重ね、左半分だけ見せて
-   「左の人物だけ口パク」を実現(クマは閉じたまま)。 */
+/* --- 左: キャラ --- */
+.stage .chars { position: relative; display: flex; align-items: flex-end; justify-content: center; min-width: 0; }
 .stage .character-wrap {
   position: relative;
   display: inline-block;
@@ -35,42 +36,53 @@ html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hira
   filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
   transition: filter 200ms ease;
 }
-.stage .character {
-  height: clamp(240px, 60vh, 720px);
-  width: auto;
-  max-width: 92vw;
-  object-fit: contain;
-}
-.stage .character.base { display: block; }
-.stage .character.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 45ms linear;
-}
+.stage .character { height: min(90vh, 900px); width: auto; max-width: 100%; object-fit: contain; display: block; }
+.stage .character.overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 45ms linear; }
 .stage .character.overlay.show { opacity: 1; }
-.stage .character-wrap.unlocked { filter: drop-shadow(0 0 42px rgba(255,207,107,.95)); }
+.stage .character-wrap.unlocked { filter: drop-shadow(0 0 46px rgba(255,207,107,.95)); }
+/* オチエク: れのあの約1/3。頭の右上あたりに浮遊 */
+.stage .oti {
+  position: absolute;
+  height: 33%;
+  width: auto;
+  top: -3%;
+  right: -13%;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,.55));
+  animation: oti-float 3.2s ease-in-out infinite;
+}
+@keyframes oti-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7%); } }
 
-.stage .subtitle {
-  font-size: clamp(1.8rem, 5vh, 4rem);
-  font-weight: 700;
-  max-width: 90vw;
-  min-height: 1.2em;
-  background: rgba(0,0,0,.45);
-  padding: .35em .9em;
-  border-radius: .7rem;
-  text-shadow: 0 2px 12px rgba(0,0,0,.7);
+/* --- 右: パネル(QR or チャット) --- */
+.stage .panel { display: flex; flex-direction: column; min-height: 0; gap: 1rem; }
+.stage .panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  font-size: clamp(1.2rem, 2.8vh, 2rem); font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.7);
 }
-.stage .customer { font-size: clamp(1rem, 2.4vh, 1.6rem); opacity: .85; min-height: 1.4em; text-shadow: 0 2px 8px rgba(0,0,0,.7); }
-.stage .price { font-size: clamp(1.4rem, 4vh, 3rem); color: #ffcf6b; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,.7); }
+.stage .panel-head .price { color: #ffcf6b; }
 .stage .join {
-  display: flex; align-items: center; gap: 2rem;
-  background: #fff; color: #12100e; padding: 1.5rem 2rem; border-radius: 1rem;
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+  background: rgba(255,255,255,.95); color: #12100e; border-radius: 1.2rem; padding: 2rem;
 }
-.stage .code { font-size: clamp(2rem, 6vh, 5rem); font-weight: 900; letter-spacing: .2em; }
+.stage .join .sub { font-size: .9rem; opacity: .7; }
+.stage .code { font-size: clamp(2rem, 6vh, 4rem); font-weight: 900; letter-spacing: .15em; margin-top: .4rem; }
+.stage .chatlog {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .6rem;
+  padding: 1rem; background: rgba(0,0,0,.42); border-radius: 1.2rem;
+}
+.stage .chatlog .hint { align-self: center; opacity: .75; margin: auto 0; }
+.stage .cbubble {
+  padding: .7rem 1.05rem; border-radius: 1.2rem; max-width: 82%; white-space: pre-wrap;
+  font-size: clamp(1.05rem, 2.4vh, 1.7rem); line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.stage .cbubble.me { align-self: flex-end; background: #06c755; color: #fff; border-bottom-right-radius: .3rem; }
+.stage .cbubble.shop { align-self: flex-start; background: #fff; color: #12100e; border-bottom-left-radius: .3rem; }
+
+/* --- 隅のコントロール --- */
+.stage-controls { position: absolute; top: 1.4vh; right: 1.2vw; z-index: 2; display: flex; gap: .6rem; }
+.stage-controls button {
+  padding: .6rem 1rem; font-size: 1rem; border: 0; border-radius: .6rem; cursor: pointer;
+  background: #f0a500; color: #12100e; font-weight: 700;
+}
 
 /* コントローラ(スマホ)= 明色・チャット */
 .play { max-width: 560px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 1rem; }
