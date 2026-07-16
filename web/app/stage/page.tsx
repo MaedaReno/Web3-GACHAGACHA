@@ -5,9 +5,22 @@ import { QRCodeSVG } from "qrcode.react";
 import { WS_URL, type ServerMessage } from "@/lib/types";
 import { metamaskDeepLink } from "@/lib/ichigo";
 
+// キャラの表情。closed=通常(口閉じ)、open=口開き(あれば口パクで切替)。
+// ※ 素材が「2人セット1枚・同表情」のため、口パクは2人一緒。個別化には各キャラの
+//   透過PNG(口閉じ/口開き)を別レイヤーで用意する必要がある。
+const EXPRESSIONS: Record<string, { closed: string; open?: string }> = {
+  neutral: { closed: "/futari.jpg", open: "/futari-kuti.jpg" },
+  joy: { closed: "/futari-yorokobi.jpg" },
+  thanks: { closed: "/futari-kannsha.jpg" },
+  troubled: { closed: "/futari-komari.jpg" },
+};
+const ALL_IMAGES = [
+  "/futari.jpg", "/futari-kuti.jpg", "/futari-yorokobi.jpg",
+  "/futari-kannsha.jpg", "/futari-komari.jpg",
+];
+
 // ステージ画面(会場の大画面)。
-// ルーム作成 → QR表示 → 接客中は 字幕 + 価格 + アバターの口パク + VOICEVOX音声。
-// 将来: アバターの絵を差し替える(今は口の開閉を絵文字で簡易表現)。
+// ルーム作成 → QR表示 → 接客中は 字幕 + 価格 + キャラの口パク + VOICEVOX音声。
 export default function StagePage() {
   const [code, setCode] = useState<string>("");
   const [subtitle, setSubtitle] = useState<string>("いらっしゃい!QRを読み取ってな");
@@ -18,6 +31,7 @@ export default function StagePage() {
   const [controllerUrl, setControllerUrl] = useState<string>("");
   const [audioReady, setAudioReady] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
+  const [expression, setExpression] = useState<string>("neutral");
 
   const wsRef = useRef<WebSocket | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -53,6 +67,7 @@ export default function StagePage() {
         case "unlocked":
           setUnlocked(true);
           setFinalized(true);
+          setExpression("joy");
           setSubtitle("開錠!まいど、ありがとう!ガチャ回してや!");
           break;
         case "reset_done":
@@ -62,12 +77,21 @@ export default function StagePage() {
           setPrice(null);
           setFinalized(false);
           setUnlocked(false);
+          setExpression("neutral");
           break;
       }
     };
     ws.onclose = () => setSubtitle((s) => s + "(接続が切れました。再読み込みしてね)");
     return () => ws.close();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 画像を事前読み込みして、口パク切替時のちらつきを防ぐ
+  useEffect(() => {
+    ALL_IMAGES.forEach((s) => {
+      const im = new window.Image();
+      im.src = s;
+    });
   }, []);
 
   // ブラウザの自動再生制限のため、最初に一度クリックして音声を有効化する。
@@ -129,15 +153,20 @@ export default function StagePage() {
     tick();
   };
 
+  // 表情+口パク: 口開き画像があるときは mouthOpen で closed↔open を差し替え(本物の口パク)。
+  // 無い表情のときは talking クラスで軽く弾ませる(擬似)。
+  const expr = EXPRESSIONS[expression] ?? EXPRESSIONS.neutral;
+  const hasOpen = !!expr.open;
+  const charSrc = hasOpen && mouthOpen ? expr.open! : expr.closed;
+
   return (
     <main className="stage">
-      {/* キャラ立ち絵。しゃべっている間は音量で軽く弾む(擬似リップシンク)。
-          将来「口を開けた版」を用意すれば、mouthOpen で画像を差し替えて本物の口パクにできる。 */}
+      {/* キャラ立ち絵。素材が2人セットのため口パクは2人一緒(個別化には各キャラの透過PNGが必要)。 */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/futari.jpg"
+        src={charSrc}
         alt="ガチャ店番"
-        className={`character${mouthOpen ? " talking" : ""}${unlocked ? " unlocked" : ""}`}
+        className={`character${!hasOpen && mouthOpen ? " talking" : ""}${unlocked ? " unlocked" : ""}`}
       />
       {unlocked && <div style={{ fontSize: "clamp(3rem, 10vh, 8rem)" }}>🎉</div>}
       <div className="customer">{customer}</div>
