@@ -59,6 +59,7 @@ html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hira
   font-size: clamp(1.2rem, 2.8vh, 2rem); font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.7);
 }
 .stage .panel-head .price { color: #ffcf6b; }
+.stage .panel-head .turns { color: #9fd3ff; font-size: .8em; font-weight: 700; }
 .stage .join {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
   background: rgba(255,255,255,.95); color: #12100e; border-radius: 1.2rem; padding: 2rem;

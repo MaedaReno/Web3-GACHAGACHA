@@ -7,7 +7,7 @@ export type ServerMessage =
   | { type: "user_text"; text: string }
   | { type: "agent_reply"; text: string }
   | { type: "speech"; audio_b64: string }
-  | { type: "state"; price: number; list_price: number; quiz_correct: number; finalized: boolean; final_price: number | null; rewards: string[] }
+  | { type: "state"; price: number; list_price: number; quiz_correct: number; finalized: boolean; final_price: number | null; rewards: string[]; turns_left: number; max_turns: number }
   | { type: "error"; message: string }
   | { type: "payment_error"; message: string }
   | { type: "unlocked"; price: number; tx: string }

@@ -24,6 +24,7 @@ export default function PlayPage() {
   const [price, setPrice] = useState<number | null>(null);
   const [finalized, setFinalized] = useState(false);
   const [finalPrice, setFinalPrice] = useState<number | null>(null);
+  const [turnsLeft, setTurnsLeft] = useState<number | null>(null);
   const [connected, setConnected] = useState(false);
   const [input, setInput] = useState("");
   const [recording, setRecording] = useState(false);
@@ -62,6 +63,7 @@ export default function PlayPage() {
           setPrice(msg.price);
           setFinalized(msg.finalized);
           setFinalPrice(msg.final_price);
+          setTurnsLeft(msg.turns_left);
           break;
         case "unlocked":
           setPaid(true);
@@ -179,7 +181,10 @@ export default function PlayPage() {
 
       {price !== null && (
         <div className="priceBar">
-          {finalized ? `お会計: ${finalPrice} トークン` : `ただいまの言い値: ${price} トークン`}
+          {finalized
+            ? `お会計: ${finalPrice} トークン`
+            : `ただいまの言い値: ${price} トークン` +
+              (turnsLeft !== null ? `(残り${turnsLeft}ターン)` : "")}
         </div>
       )}
 

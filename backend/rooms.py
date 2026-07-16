@@ -15,6 +15,7 @@ import string
 from dataclasses import dataclass, field
 from typing import Callable
 
+from . import config
 from .llm import Agent
 
 # 紛らわしい文字(0/O, 1/I/L)を除いたコード用アルファベット
@@ -38,6 +39,8 @@ class Room:
     def state_snapshot(self) -> dict:
         """クライアントへ送ってよい状態だけを返す。床値(effective_floor)は絶対に含めない。"""
         s = self.agent.game.state
+        # 残りターン = 最大 - 消化済み(0未満にはしない)。クライアントで「残り○ターン」表示に使う。
+        turns_left = max(config.MAX_NEGOTIATION_TURNS - s.negotiation_turns, 0)
         return {
             "type": "state",
             "price": s.current_price,
@@ -46,6 +49,8 @@ class Room:
             "finalized": s.deal_finalized,
             "final_price": s.final_price,
             "rewards": s.rewards,
+            "turns_left": turns_left,
+            "max_turns": config.MAX_NEGOTIATION_TURNS,
         }
 
 

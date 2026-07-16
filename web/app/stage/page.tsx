@@ -24,6 +24,7 @@ export default function StagePage() {
   const [price, setPrice] = useState<number | null>(null);
   const [finalized, setFinalized] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+  const [turnsLeft, setTurnsLeft] = useState<number | null>(null);
   const [audioReady, setAudioReady] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [expression] = useState<string>("neutral");
@@ -63,6 +64,7 @@ export default function StagePage() {
         case "state":
           setPrice(msg.price);
           setFinalized(msg.finalized);
+          setTurnsLeft(msg.turns_left);
           break;
         case "unlocked":
           setUnlocked(true);
@@ -239,12 +241,17 @@ export default function StagePage() {
         <section className="panel">
           <div className="panel-head">
             <span>🎰 ガチャ店長</span>
-            {price !== null && (
-              <span className="price">
-                {finalized ? "お会計 " : "言い値 "}
-                {price} トークン{finalized ? " で決定!" : ""}
-              </span>
-            )}
+            <span style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+              {connected && !finalized && turnsLeft !== null && (
+                <span className="turns">残り{turnsLeft}ターン</span>
+              )}
+              {price !== null && (
+                <span className="price">
+                  {finalized ? "お会計 " : "言い値 "}
+                  {price} トークン{finalized ? " で決定!" : ""}
+                </span>
+              )}
+            </span>
           </div>
 
           {!connected ? (
