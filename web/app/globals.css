@@ -36,11 +36,10 @@ html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hira
   transition: filter 200ms ease;
 }
 .stage .character {
-  height: clamp(240px, 54vh, 640px);
+  height: clamp(240px, 60vh, 720px);
   width: auto;
   max-width: 92vw;
   object-fit: contain;
-  border-radius: 1rem;
 }
 .stage .character.base { display: block; }
 .stage .character.overlay {
@@ -52,8 +51,6 @@ html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hira
   opacity: 0;
   transition: opacity 45ms linear;
 }
-/* 左側(人物)だけを見せる。右のクマ側(右50%)は隠す。※必要なら % を微調整 */
-.stage .character.overlay.speaker-left { clip-path: inset(0 50% 0 0); }
 .stage .character.overlay.show { opacity: 1; }
 .stage .character-wrap.unlocked { filter: drop-shadow(0 0 42px rgba(255,207,107,.95)); }
 

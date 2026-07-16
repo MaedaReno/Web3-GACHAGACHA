@@ -5,19 +5,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { WS_URL, type ServerMessage } from "@/lib/types";
 import { metamaskDeepLink } from "@/lib/ichigo";
 
-// キャラの表情。closed=通常(口閉じ)、open=口開き(あれば口パクで切替)。
-// ※ 素材が「2人セット1枚・同表情」のため、口パクは2人一緒。個別化には各キャラの
-//   透過PNG(口閉じ/口開き)を別レイヤーで用意する必要がある。
+// メインキャラ(黒人の店主 renoa)を背景透過PNGで表示。口閉じ↔口開きを音量で
+// 差し替えて口パク。表情差分(喜び等)の単体素材が用意できたら EXPRESSIONS に追加する。
 const EXPRESSIONS: Record<string, { closed: string; open?: string }> = {
-  neutral: { closed: "/futari.jpg", open: "/futari-kuti.jpg" },
-  joy: { closed: "/futari-yorokobi.jpg" },
-  thanks: { closed: "/futari-kannsha.jpg" },
-  troubled: { closed: "/futari-komari.jpg" },
+  neutral: { closed: "/renoa.png", open: "/renoa-kuti.png" },
 };
-const ALL_IMAGES = [
-  "/futari.jpg", "/futari-kuti.jpg", "/futari-yorokobi.jpg",
-  "/futari-kannsha.jpg", "/futari-komari.jpg",
-];
+const ALL_IMAGES = ["/renoa.png", "/renoa-kuti.png"];
 
 // ステージ画面(会場の大画面)。
 // ルーム作成 → QR表示 → 接客中は 字幕 + 価格 + キャラの口パク + VOICEVOX音声。
@@ -67,7 +60,6 @@ export default function StagePage() {
         case "unlocked":
           setUnlocked(true);
           setFinalized(true);
-          setExpression("joy");
           setSubtitle("開錠!まいど、ありがとう!ガチャ回してや!");
           break;
         case "reset_done":
@@ -153,19 +145,19 @@ export default function StagePage() {
     tick();
   };
 
-  // 表情+口パク: ベース(口閉じ)の上に口開き画像を重ね、左半分(人物)だけ見せて喋らせる。
+  // 口パク: ベース(口閉じ)の上に口開きを重ね、mouthOpen で切り替える(全身差し替え)。
   const expr = EXPRESSIONS[expression] ?? EXPRESSIONS.neutral;
 
   return (
     <main className="stage">
-      {/* 左の人物だけ口パク:ベース=口閉じ、重ね=口開きの左半分(クマは常に口閉じ)。 */}
+      {/* メインキャラ(透過PNG)。しゃべる間だけ口開きを重ねて口パク。 */}
       <div className={`character-wrap${unlocked ? " unlocked" : ""}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="character base" src={expr.closed} alt="ガチャ店番" />
+        <img className="character base" src={expr.closed} alt="ガチャ店主" />
         {expr.open && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            className={`character overlay speaker-left${mouthOpen ? " show" : ""}`}
+            className={`character overlay${mouthOpen ? " show" : ""}`}
             src={expr.open}
             alt=""
             aria-hidden="true"
