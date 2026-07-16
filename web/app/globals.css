@@ -26,19 +26,36 @@ html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hira
 }
 .stage > * { position: relative; z-index: 1; }
 
-/* キャラ立ち絵。しゃべっている間(.talking)は音量に合わせて軽く弾む=擬似リップシンク */
+/* キャラ立ち絵。ベース(口閉じ)の上に口開き画像を重ね、左半分だけ見せて
+   「左の人物だけ口パク」を実現(クマは閉じたまま)。 */
+.stage .character-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
+  transition: filter 200ms ease;
+}
 .stage .character {
   height: clamp(240px, 54vh, 640px);
   width: auto;
   max-width: 92vw;
   object-fit: contain;
   border-radius: 1rem;
-  filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
-  transition: transform 90ms ease, filter 200ms ease;
-  transform-origin: center bottom;
 }
-.stage .character.talking { transform: scale(1.035) translateY(-1%); }
-.stage .character.unlocked { filter: drop-shadow(0 0 42px rgba(255,207,107,.95)); }
+.stage .character.base { display: block; }
+.stage .character.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 45ms linear;
+}
+/* 左側(人物)だけを見せる。右のクマ側(右50%)は隠す。※必要なら % を微調整 */
+.stage .character.overlay.speaker-left { clip-path: inset(0 50% 0 0); }
+.stage .character.overlay.show { opacity: 1; }
+.stage .character-wrap.unlocked { filter: drop-shadow(0 0 42px rgba(255,207,107,.95)); }
 
 .stage .subtitle {
   font-size: clamp(1.8rem, 5vh, 4rem);

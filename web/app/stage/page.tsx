@@ -153,21 +153,25 @@ export default function StagePage() {
     tick();
   };
 
-  // 表情+口パク: 口開き画像があるときは mouthOpen で closed↔open を差し替え(本物の口パク)。
-  // 無い表情のときは talking クラスで軽く弾ませる(擬似)。
+  // 表情+口パク: ベース(口閉じ)の上に口開き画像を重ね、左半分(人物)だけ見せて喋らせる。
   const expr = EXPRESSIONS[expression] ?? EXPRESSIONS.neutral;
-  const hasOpen = !!expr.open;
-  const charSrc = hasOpen && mouthOpen ? expr.open! : expr.closed;
 
   return (
     <main className="stage">
-      {/* キャラ立ち絵。素材が2人セットのため口パクは2人一緒(個別化には各キャラの透過PNGが必要)。 */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={charSrc}
-        alt="ガチャ店番"
-        className={`character${!hasOpen && mouthOpen ? " talking" : ""}${unlocked ? " unlocked" : ""}`}
-      />
+      {/* 左の人物だけ口パク:ベース=口閉じ、重ね=口開きの左半分(クマは常に口閉じ)。 */}
+      <div className={`character-wrap${unlocked ? " unlocked" : ""}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="character base" src={expr.closed} alt="ガチャ店番" />
+        {expr.open && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            className={`character overlay speaker-left${mouthOpen ? " show" : ""}`}
+            src={expr.open}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
+      </div>
       {unlocked && <div style={{ fontSize: "clamp(3rem, 10vh, 8rem)" }}>🎉</div>}
       <div className="customer">{customer}</div>
       <div className="subtitle">{subtitle}</div>
