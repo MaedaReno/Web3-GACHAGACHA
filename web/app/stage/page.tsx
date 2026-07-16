@@ -131,8 +131,15 @@ export default function StagePage() {
 
   return (
     <main className="stage">
-      {/* アバター(今は口の開閉を絵文字で簡易表現。将来 立ち絵の口パク画像に差し替え) */}
-      <div className="avatar">{unlocked ? "🎉" : mouthOpen ? "😮" : "🙂"}</div>
+      {/* キャラ立ち絵。しゃべっている間は音量で軽く弾む(擬似リップシンク)。
+          将来「口を開けた版」を用意すれば、mouthOpen で画像を差し替えて本物の口パクにできる。 */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/futari.jpg"
+        alt="ガチャ店番"
+        className={`character${mouthOpen ? " talking" : ""}${unlocked ? " unlocked" : ""}`}
+      />
+      {unlocked && <div style={{ fontSize: "clamp(3rem, 10vh, 8rem)" }}>🎉</div>}
       <div className="customer">{customer}</div>
       <div className="subtitle">{subtitle}</div>
       {price !== null && (

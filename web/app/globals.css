@@ -1,29 +1,57 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; }
 
-/* ステージ(大画面)= 暗色・大きく */
+/* ステージ(大画面)= 祭り会場背景 + キャラ立ち絵 */
 .stage {
+  position: relative;
   min-height: 100vh;
-  background: #12100e;
-  color: #f4f1ea;
+  background: #12100e url('/maturi-kaijou.jpg') center / cover no-repeat;
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  padding: 3vh 4vw;
+  gap: 1.4rem;
+  padding: 3vh 4vw 5vh;
   text-align: center;
+  overflow: hidden;
 }
-.stage .avatar { font-size: clamp(6rem, 22vh, 16rem); line-height: 1; }
+/* 背景を少し暗くして字幕を読みやすく(特に下部) */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.20) 0%, rgba(0,0,0,.10) 45%, rgba(0,0,0,.72) 100%);
+  pointer-events: none;
+}
+.stage > * { position: relative; z-index: 1; }
+
+/* キャラ立ち絵。しゃべっている間(.talking)は音量に合わせて軽く弾む=擬似リップシンク */
+.stage .character {
+  height: clamp(240px, 54vh, 640px);
+  width: auto;
+  max-width: 92vw;
+  object-fit: contain;
+  border-radius: 1rem;
+  filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
+  transition: transform 90ms ease, filter 200ms ease;
+  transform-origin: center bottom;
+}
+.stage .character.talking { transform: scale(1.035) translateY(-1%); }
+.stage .character.unlocked { filter: drop-shadow(0 0 42px rgba(255,207,107,.95)); }
+
 .stage .subtitle {
   font-size: clamp(1.8rem, 5vh, 4rem);
   font-weight: 700;
   max-width: 90vw;
   min-height: 1.2em;
-  text-shadow: 0 2px 12px rgba(0,0,0,.5);
+  background: rgba(0,0,0,.45);
+  padding: .35em .9em;
+  border-radius: .7rem;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7);
 }
-.stage .customer { font-size: clamp(1rem, 2.4vh, 1.6rem); opacity: .7; min-height: 1.4em; }
-.stage .price { font-size: clamp(1.4rem, 4vh, 3rem); color: #ffcf6b; font-weight: 800; }
+.stage .customer { font-size: clamp(1rem, 2.4vh, 1.6rem); opacity: .85; min-height: 1.4em; text-shadow: 0 2px 8px rgba(0,0,0,.7); }
+.stage .price { font-size: clamp(1.4rem, 4vh, 3rem); color: #ffcf6b; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,.7); }
 .stage .join {
   display: flex; align-items: center; gap: 2rem;
   background: #fff; color: #12100e; padding: 1.5rem 2rem; border-radius: 1rem;
