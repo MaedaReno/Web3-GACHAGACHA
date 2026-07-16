@@ -8,6 +8,15 @@ const TOKEN_ADDR =
 const GAME_WALLET =
   process.env.NEXT_PUBLIC_GACHA_WALLET || "0x0d9Ff88703b8bcB42ca7e526246C2dcf9A4aEdb9";
 
+// 通常ブラウザ(Chrome等)には window.ethereum が無い。MetaMask アプリ内ブラウザで
+// 開き直すためのディープリンク。metamask.app.link/dapp/ は「スキーム無し」のURLを取る。
+//   例) https://app.vercel.app/play?room=ABCD
+//       → https://metamask.app.link/dapp/app.vercel.app/play?room=ABCD
+export function metamaskDeepLink(url: string): string {
+  const stripped = url.replace(/^https?:\/\//, "");
+  return `https://metamask.app.link/dapp/${stripped}`;
+}
+
 const OPTIMISM = {
   chainId: "0xa", // 10 = Optimism
   chainName: "OP Mainnet",

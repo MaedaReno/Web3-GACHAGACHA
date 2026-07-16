@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { WS_URL, type ServerMessage } from "@/lib/types";
+import { metamaskDeepLink } from "@/lib/ichigo";
 
 // ステージ画面(会場の大画面)。
 // ルーム作成 → QR表示 → 接客中は 字幕 + 価格 + アバターの口パク + VOICEVOX音声。
@@ -31,7 +32,10 @@ export default function StagePage() {
       switch (msg.type) {
         case "room_created":
           setCode(msg.room);
-          setControllerUrl(`${window.location.origin}/play?room=${msg.room}`);
+          // QRは MetaMask アプリ内ブラウザで開くディープリンクにする(決済に window.ethereum が要るため)。
+          setControllerUrl(
+            metamaskDeepLink(`${window.location.origin}/play?room=${msg.room}`),
+          );
           break;
         case "user_text":
           setCustomer(`お客さん: ${msg.text}`);
@@ -142,7 +146,8 @@ export default function StagePage() {
         <div className="join">
           <QRCodeSVG value={controllerUrl} size={200} />
           <div>
-            <div style={{ fontSize: "1.2rem" }}>スマホで読み取ってね</div>
+            <div style={{ fontSize: "1.2rem" }}>スマホのカメラで読み取ってね</div>
+            <div style={{ fontSize: "0.9rem", opacity: 0.8 }}>(MetaMaskアプリが開きます)</div>
             <div className="code">{code}</div>
           </div>
         </div>

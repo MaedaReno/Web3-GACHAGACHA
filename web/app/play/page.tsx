@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { WS_URL, type ServerMessage } from "@/lib/types";
-import { payIchigo } from "@/lib/ichigo";
+import { payIchigo, metamaskDeepLink } from "@/lib/ichigo";
 
 type Line = { who: "me" | "shop" | "sys"; text: string };
 
@@ -29,6 +29,7 @@ export default function PlayPage() {
   const [recording, setRecording] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [hasWallet, setHasWallet] = useState(true); // MetaMask(window.ethereum)が使えるか
 
   const wsRef = useRef<WebSocket | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
@@ -87,6 +88,16 @@ export default function PlayPage() {
     logRef.current?.scrollTo(0, logRef.current.scrollHeight);
   }, [lines]);
 
+  // MetaMask(window.ethereum)の有無を判定。通常ブラウザには無いので、その場合は
+  // 「MetaMaskで開く」ボタンで MetaMask アプリ内ブラウザへ誘導する。
+  useEffect(() => {
+    setHasWallet(!!(window as any).ethereum);
+  }, []);
+
+  const openInMetaMask = () => {
+    window.location.href = metamaskDeepLink(window.location.href);
+  };
+
   const sendText = (e: React.FormEvent) => {
     e.preventDefault();
     const text = input.trim();
@@ -134,6 +145,12 @@ export default function PlayPage() {
   // --- MetaMask で支払う(確定額を送金 → tx hash をサーバへ) ---
   const pay = async () => {
     if (finalPrice == null || paying) return;
+    // 通常ブラウザ(window.ethereum 無し)なら MetaMask アプリ内ブラウザで開き直す。
+    if (!(window as any).ethereum) {
+      setLines((l) => [...l, { who: "sys", text: "MetaMaskアプリで開き直します…" }]);
+      openInMetaMask();
+      return;
+    }
     setPaying(true);
     try {
       const { hash, address } = await payIchigo(finalPrice, (m) =>
@@ -166,13 +183,21 @@ export default function PlayPage() {
         </div>
       )}
 
-      {finalized && !paid && (
+      {finalized && !paid && hasWallet && (
         <button
           onClick={pay}
           disabled={paying || !connected}
           style={{ padding: "0.9rem", fontSize: "1.05rem", background: "#f0a500", color: "#12100e" }}
         >
           {paying ? "処理中…" : `MetaMaskで支払う(${finalPrice} ICHIGO)`}
+        </button>
+      )}
+      {finalized && !paid && !hasWallet && (
+        <button
+          onClick={openInMetaMask}
+          style={{ padding: "0.9rem", fontSize: "1.05rem", background: "#f0a500", color: "#12100e" }}
+        >
+          🦊 MetaMaskアプリで開いて支払う({finalPrice} ICHIGO)
         </button>
       )}
       {paid && <div className="priceBar">✅ 支払い完了・開錠済み。ありがとう!</div>}
