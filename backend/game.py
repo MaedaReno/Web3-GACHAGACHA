@@ -49,6 +49,7 @@ class TransactionState:
     deal_finalized: bool = False
     final_price: int | None = None
     rewards: list[str] = field(default_factory=list)
+    negotiation_turns: int = 0                  # お客さんの発話回数(交渉ターン)
 
     # --- 内部計算 ---
     @property
@@ -77,6 +78,14 @@ class Game:
             amount = int(amount)
         except (TypeError, ValueError):
             return {"ok": False, "reason": "金額は整数で指定してください。"}
+
+        # 単調減少: 一度下げた値段より高くは戻さない(値切りは下げる方向のみ)。
+        if amount > self.state.current_price:
+            return {
+                "ok": False,
+                "current_price": self.state.current_price,
+                "reason": "一度提示した値段より高くはできません。",
+            }
 
         floor = self.state.effective_floor
         if amount < floor:

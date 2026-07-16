@@ -8,6 +8,7 @@
 
 from types import SimpleNamespace
 
+from . import config
 from .game import Game
 from .llm import Agent
 from .rag import Retriever
@@ -37,18 +38,18 @@ class FakeClient:
 
 def test_tool_use_drives_game_and_returns_text():
     scripted = [
-        # 1回目: set_price(250) を要求
-        ([_text("ええで、ほな"), _tool_use("t1", "set_price", {"amount": 250})], "tool_use"),
+        # 1回目: set_price(1800) を要求(元値2000から少し値下げ)
+        ([_text("いいですよ"), _tool_use("t1", "set_price", {"amount": 1800})], "tool_use"),
         # 2回目: ツール結果を受けて最終発話
-        ([_text("毎度!250トークンでどや?")], "end_turn"),
+        ([_text("では1800トークンでどうでしょう?")], "end_turn"),
     ]
     fake = FakeClient(scripted)
     agent = Agent(game=Game(), retriever=Retriever(), client=fake)
 
-    reply = agent.send("300は高い、250にして")
+    reply = agent.send("2000は高いので1800にしてください")
 
-    assert reply == "毎度!250トークンでどや?"
-    assert agent.game.state.current_price == 250
+    assert reply == "では1800トークンでどうでしょう?"
+    assert agent.game.state.current_price == 1800
     # 2回 create が呼ばれ、2回目には tool_result を含む user メッセージが渡っている
     assert len(fake.calls) == 2
     last_msgs = fake.calls[1]["messages"]
@@ -68,7 +69,7 @@ def test_floor_clamp_is_enforced_through_the_loop():
     ]
     agent = Agent(game=Game(), retriever=Retriever(), client=FakeClient(scripted))
     agent.send("10トークンにして")
-    assert agent.game.state.current_price >= 100  # ABSOLUTE_MIN 以上
+    assert agent.game.state.current_price >= config.ABSOLUTE_MIN_PRICE  # 絶対下限以上
 
 
 def _run_all():

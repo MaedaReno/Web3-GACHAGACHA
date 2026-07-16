@@ -60,8 +60,8 @@ def test_reset_room_gives_fresh_state():
     room = m.create_room()
     code_before = room.code
     # 前のお客さんが値切って価格が動いた状態を作る
-    room.agent.game.set_price(210)
-    assert room.state_snapshot()["price"] == 210
+    room.agent.game.set_price(1800)
+    assert room.state_snapshot()["price"] == 1800
     # 次のお客さんへ:会話・価格が新品に戻る。ルームコードは維持
     m.reset_room(room)
     assert room.code == code_before

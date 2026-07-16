@@ -19,9 +19,18 @@ def test_price_never_below_floor():
 
 def test_normal_negotiation_within_range():
     g = Game()
-    r = g.set_price(250)
+    r = g.set_price(1800)  # 元値2000から下限より上へ値下げ
     assert r["ok"] is True
-    assert g.state.current_price == 250
+    assert g.state.current_price == 1800
+
+
+def test_price_is_monotonic_non_increasing():
+    # 一度下げた値段より高くは戻せない(値切りは下げる方向のみ)
+    g = Game()
+    assert g.set_price(1700)["ok"] is True
+    r = g.set_price(1900)
+    assert r["ok"] is False
+    assert g.state.current_price == 1700
 
 
 def test_correct_quiz_lowers_effective_floor():
@@ -77,12 +86,12 @@ def test_absolute_min_is_respected_even_with_rewards():
 
 def test_finalize_locks_price():
     g = Game()
-    g.set_price(250)
+    g.set_price(1800)
     f = g.finalize_deal()
-    assert f["ok"] is True and f["final_price"] == 250
+    assert f["ok"] is True and f["final_price"] == 1800
     # 確定後は変更不可
-    assert g.set_price(200)["ok"] is False
-    assert g.state.final_price == 250
+    assert g.set_price(1700)["ok"] is False
+    assert g.state.final_price == 1800
 
 
 def test_normalize_handles_width_and_symbols():
